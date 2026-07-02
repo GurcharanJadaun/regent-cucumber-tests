@@ -1,0 +1,31 @@
+# Maven
+target/
+!drivers/.gitkeep
+
+# Java
+*.class
+*.log
+
+# WebDriver binaries
+drivers/*
+!drivers/.gitkeep
+
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code local state
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# Logs
+logs/
+*.log

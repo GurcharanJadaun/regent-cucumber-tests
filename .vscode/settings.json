@@ -1,0 +1,19 @@
+{
+  "cucumberautocomplete.steps": [
+    "src/test/java/com/regent/cucumber/steps/*.java"
+  ],
+  "cucumberautocomplete.syncfeatures": "src/test/resources/features/*.feature",
+  "cucumberautocomplete.strictGherkinCompletion": true,
+  "cucumberautocomplete.smartSnippets": true,
+  "cucumberautocomplete.stepsInvariants": true,
+  "cucumberautocomplete.customParameters": [
+    { "parameter": "{string}", "value": "'.*'" },
+    { "parameter": "{int}", "value": "\\d+" }
+  ],
+  "cucumberautocomplete.formatConfOverride": {
+    "And": null
+  },
+  "files.associations": {
+    "*.feature": "feature"
+  }
+}
