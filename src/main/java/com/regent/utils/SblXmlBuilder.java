@@ -91,20 +91,17 @@ public class SblXmlBuilder {
             demo.setAttribute("residencyStatus",        "InState");
             demo.setAttribute("stateOfLegalResidence",  "NJ");
             demo.setAttribute("residencyDate",          "1994-01-01");
-            demo.setAttribute("driversLicense",         "");
+            demo.setAttribute("driversLicense",         "RK0969874");
             demo.setAttribute("admittedDate",           "2013-01-01");
             demo.setAttribute("veteranStatus",          "Blank");
             demo.setAttribute("disabilityStatus",       "No");
 
-            Element addr = doc.createElement("address");
-            studentEl.appendChild(addr);
-            addr.setAttribute("type",          "Original");
-            addr.setAttribute("line1",         "123 Test Street");
-            addr.setAttribute("line2",         "");
-            addr.setAttribute("city",          "Testville");
-            addr.setAttribute("stateProvince", "MN");
-            addr.setAttribute("postalCode",    "55401");
-            addr.setAttribute("country",       "US");
+            Element testScore = doc.createElement("userDefinedTestScore");
+            studentEl.appendChild(testScore);
+            testScore.setAttribute("testName",  "SAT");
+            testScore.setAttribute("testScore", "1120");
+
+            addAddress(doc, studentEl, "Original", "02 WALNUT ROAD", "2nd Line Street", "ACWORTH", "NH", "03601");
 
             Element phone = doc.createElement("phone");
             studentEl.appendChild(phone);
@@ -115,6 +112,8 @@ public class SblXmlBuilder {
             studentEl.appendChild(email);
             email.setAttribute("email", student.getEmail());
             email.setAttribute("type",  "Home");
+
+            addParentspouse(doc, studentEl, student);
 
             int beforeUnits   = 12 / Math.max(beforeCount, 1);
             int previousUnits = 12 / Math.max(previousCount, 1);
@@ -161,6 +160,52 @@ public class SblXmlBuilder {
             return LocalDate.now().toString();
         }
         return LocalDate.parse(dateToSet, MMDDYYYY).toString();
+    }
+
+    /** Matches AddressSbl field order/defaults from the reference SblBuilder; country is always "US". */
+    private static void addAddress(Document doc, Element parent, String type, String line1,
+                                    String line2, String city, String stateProvince, String postalCode) {
+        Element addr = doc.createElement("address");
+        parent.appendChild(addr);
+        addr.setAttribute("type",          type);
+        addr.setAttribute("line1",         line1);
+        addr.setAttribute("line2",         line2);
+        addr.setAttribute("city",          city);
+        addr.setAttribute("stateProvince", stateProvince);
+        addr.setAttribute("postalCode",    postalCode);
+        addr.setAttribute("country",       "US");
+    }
+
+    /**
+     * Matches ParentspouseSbl's default (parameterized) constructor: a required element for
+     * dependent-student SAI/eligibility calculation — omitting it results in zero awards on
+     * packaging even though the SBL import itself completes successfully.
+     */
+    private static void addParentspouse(Document doc, Element studentEl, StudentUser student) {
+        Element parent = doc.createElement("parentspouse");
+        studentEl.appendChild(parent);
+        String firstName = "F" + student.getFirstName();
+        String lastName  = student.getLastName();
+        parent.setAttribute("type",                 "Father");
+        parent.setAttribute("firstName",             firstName);
+        parent.setAttribute("lastName",              lastName);
+        parent.setAttribute("dateOfBirth",           "1965-11-07");
+        parent.setAttribute("socialSecurityNumber",  "222334444");
+        parent.setAttribute("citizenshipStatus",     "USCitizen");
+        parent.setAttribute("plusBorrower",          "false");
+        parent.setAttribute("ferpa",                 "true");
+
+        addAddress(doc, parent, "Original", "02 WALNUT ROAD", "2nd Line Street", "ACWORTH", "NH", "03601");
+
+        Element phone = doc.createElement("phone");
+        parent.appendChild(phone);
+        phone.setAttribute("type",   "Home");
+        phone.setAttribute("number", "1234567890");
+
+        Element email = doc.createElement("email");
+        parent.appendChild(email);
+        email.setAttribute("email", firstName + "." + lastName + "@mailinator.com");
+        email.setAttribute("type",  "Home");
     }
 
     private static int[] courseLayout(SblOption option) {

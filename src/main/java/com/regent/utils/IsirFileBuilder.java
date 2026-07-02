@@ -90,11 +90,48 @@ public class IsirFileBuilder {
             // Federal school code (from enterprise config in feature file)
             insert(buf, 874, 879, padRight(federalSchoolCode, 6));
 
-            // Pell-specific overrides (setIsirDataForPell equivalent)
+            // Pell-specific overrides (setIsirDataForPell equivalent).
+            // The template's baked-in NSLDS Pell payment history (3 blocks) represents prior
+            // Pell disbursements at another school; leaving it in place makes the packaging
+            // engine treat this as an award-year-limit conflict and award $0. All three
+            // blocks — plus the standalone EFC field — must be blanked, not just block 1.
             if (applyPellOverrides) {
-                insert(buf, 187, 187, "B");   // saiformula = "B" (Simplified Independent)
-                insert(buf, 4658, 4659, "  "); // clear nsdlPellSequenceNumber1
-                insert(buf, 4663, 4668, "      "); // clear nsd1SAI1
+                insert(buf, 187, 187, "B");     // saiformula = "B" (Simplified Independent)
+                insert(buf, 3366, 3371, "");    // nsdlEFC1
+
+                // NSLDS Pell payment history block 1
+                insert(buf, 4658, 4659, "");    // nsdlPellSequenceNumber1
+                insert(buf, 4660, 4662, "");    // nsdlPellVerificationFlag1
+                insert(buf, 4663, 4668, "");    // nsd1SAI1
+                insert(buf, 4669, 4676, "");    // nsdlPellSchoolCode1
+                insert(buf, 4677, 4678, "");    // nsdlPellTransactionNumber1
+                insert(buf, 4679, 4686, "");    // nsdlPellLastUpdateDate1
+                insert(buf, 4687, 4692, "");    // nsdlPellScheduledAmount1
+                insert(buf, 4693, 4698, "");    // nsdlPellAmountPaidToDate1
+                insert(buf, 4699, 4705, "");    // nsdlPellPercentScheduledAwardUsedByAwardYear1
+                insert(buf, 4706, 4711, "");    // nsdlPellAwardAmount1
+
+                // NSLDS Pell payment history block 2
+                insert(buf, 4733, 4734, "");    // nsdlPellSequenceNumber2
+                insert(buf, 4735, 4737, "");    // nsdlPellVerificationFlag2
+                insert(buf, 4744, 4751, "");    // nsdlPellSchoolCode2
+                insert(buf, 4752, 4753, "");    // nsdlPellTransactionNumber2
+                insert(buf, 4754, 4761, "");    // nsdlPellLastUpdateDate2
+                insert(buf, 4762, 4767, "");    // nsdlPellScheduledAmount2
+                insert(buf, 4768, 4773, "");    // nsdlPellAmountPaidToDate2
+                insert(buf, 4774, 4780, "");    // nsdlPellPercentScheduledAwardUsedByAwardYear2
+                insert(buf, 4781, 4786, "");    // nsdlPellAwardAmount2
+
+                // NSLDS Pell payment history block 3
+                insert(buf, 4808, 4809, "");    // nsdlPellSequenceNumber3
+                insert(buf, 4810, 4812, "");    // nsdlPellVerificationFlag3
+                insert(buf, 4819, 4826, "");    // nsdlPellSchoolCode3
+                insert(buf, 4827, 4828, "");    // nsdlPellTransactionNumber3
+                insert(buf, 4829, 4836, "");    // nsdlPellLastUpdateDate3
+                insert(buf, 4837, 4842, "");    // nsdlPellScheduledAmount3
+                insert(buf, 4843, 4848, "");    // nsdlPellAmountPaidToDate3
+                insert(buf, 4849, 4855, "");    // nsdlPellPercentScheduledAwardUsedByAwardYear3
+                insert(buf, 4856, 4861, "");    // nsdlPellAwardAmount3
             }
 
             String filePath = OUTPUT_DIR + "/" + student.getIsirFileName();

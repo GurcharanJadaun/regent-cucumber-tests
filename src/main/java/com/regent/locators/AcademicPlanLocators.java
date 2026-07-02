@@ -6,8 +6,8 @@ public interface AcademicPlanLocators {
     String REFRESH_BUTTON        = "//button[@rem-trigger-event='refreshAcademicPlanClick']";
     String NO_PLAN_MESSAGE       = "//div[@class='academicPlanPartial']/h6[contains(string(),'No Current Academic Plan')]";
 
-    // Award grid — current AY section
-    String AWARD_ROW_BY_NAME     = "//div[@class='rem-academicYear-details current']//div[@class='rem-grid-col' and contains(string(),'%s')]";
+    // Award grid — current AY section. Each award is its own row, not a grid cell.
+    String AWARD_ROW_BY_NAME     = "//div[contains(@class,'rem-academicYear-details') and contains(@class,'current')]//div[contains(@class,'rem-enrollment-row') and contains(@class,'rem-award-status-valid') and contains(string(),'%s')]";
 
     // Packaging popup
     String BASIC_PACKAGING_BTN   = "id=btnBasicPackaging";
@@ -16,6 +16,6 @@ public interface AcademicPlanLocators {
 
     // Award names as they appear in the grid
     String PELL_GRANT       = "Pell Grant";
-    String DL_SUBSIDIZED    = "DL Subsidized";
-    String DL_UNSUBSIDIZED  = "DL Unsubsidized";
+    String DL_SUBSIDIZED    = "Direct Subsidized Loan";
+    String DL_UNSUBSIDIZED  = "Direct Unsubsidized Loan";
 }

@@ -60,9 +60,15 @@ public class AcademicPlanPage extends BasePage {
 
     // ── Award verification ────────────────────────────────────────────────────
 
+    /**
+     * An award can appear once per payment period, so the locator often resolves to multiple
+     * rows. isVisible()'s waitFor() enforces Playwright's strict mode (exactly one match) and
+     * would silently report "not found" via its catch block whenever more than one row matches
+     * — so this checks the first match directly instead.
+     */
     public boolean isAwardPresent(String awardName) {
         String selector = String.format(AcademicPlanLocators.AWARD_ROW_BY_NAME, awardName);
-        return isVisible(selector);
+        return page.locator(selector).first().isVisible();
     }
 
     public boolean isPellGrantAwarded()      { return isAwardPresent(AcademicPlanLocators.PELL_GRANT); }

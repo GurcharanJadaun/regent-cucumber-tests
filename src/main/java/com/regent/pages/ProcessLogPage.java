@@ -25,30 +25,20 @@ public class ProcessLogPage extends BasePage {
      */
     public void waitForImportComplete(String fileTag, boolean isSbl) {
         setSorting();
-        System.out.println("DEBUG sort state: " + page.evaluate(
-                "() => { const p = document.querySelector(\"th[data-title='Process Id']\");" +
-                "        const s = document.querySelector(\"th[data-title='Started On']\");" +
-                "        const firstRow = document.querySelector('.k-grid-content tbody tr');" +
-                "        return JSON.stringify({" +
-                "          processIdDir: p && p.getAttribute('data-dir')," +
-                "          startedOnDir: s && s.getAttribute('data-dir')," +
-                "          firstRowText: firstRow && firstRow.innerText.replace(/\\t/g,'|')" +
-                "        }); }"));
         for (int i = 0; i < MAX_POLLS; i++) {
             clickRefresh();
             page.waitForTimeout(POLL_MS);
 
             String statusSelector = String.format(ProcessLogLocators.STATUS_BY_FILENAME, fileTag);
-            if (i < 5) {
-                System.out.println("DEBUG iter=" + i + " anywhereOnPage=" +
-                        page.evaluate("() => document.body.innerText.includes('" + fileTag + "')") +
-                        " visibleNow=" + isVisibleNow(statusSelector));
-            }
             if (!isVisibleNow(statusSelector)) continue;
 
             String status = getText(statusSelector).trim();
             if (ProcessLogLocators.COMPLETE.equals(status)) {
                 if (isSbl) waitForCeRollup(fileTag);
+                // Opens the row's detail view, which is what activates the Students tab
+                // used afterward by navigateToStudent() — without this click it stays disabled.
+                click(statusSelector);
+                waitForAjaxRequestToBeFinished();
                 return;
             }
             if (ProcessLogLocators.ERROR.equals(status)) {
