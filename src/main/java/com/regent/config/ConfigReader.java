@@ -9,12 +9,16 @@ public class ConfigReader {
     private static final Properties props = new Properties();
 
     static {
+        // Different feature suites target different environments (e.g. RS-T727 on REMQA47,
+        // RS-31699 on REMQA1) — select the file via -Dconfig.file=... at the mvn invocation
+        // level, defaulting to the original REMQA47 config so existing runs are unaffected.
+        String configFile = System.getProperty("config.file", "config.properties");
         try (InputStream is = ConfigReader.class.getClassLoader()
-                .getResourceAsStream("config.properties")) {
-            if (is == null) throw new RuntimeException("config.properties not found on classpath");
+                .getResourceAsStream(configFile)) {
+            if (is == null) throw new RuntimeException(configFile + " not found on classpath");
             props.load(is);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load config.properties", e);
+            throw new RuntimeException("Failed to load " + configFile, e);
         }
     }
 

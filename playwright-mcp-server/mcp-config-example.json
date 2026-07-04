@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "java",
+      "args": [
+        "-Dspring.main.banner-mode=off",
+        "-Dlogging.pattern.console=",
+        "-jar",
+        "C:/path/to/playwright-mcp-server/target/playwright-mcp-server-1.0.0.jar"
+      ],
+      "env": {
+        "BROWSER_TYPE": "chromium",
+        "BROWSER_HEADLESS": "true"
+      }
+    }
+  }
+}

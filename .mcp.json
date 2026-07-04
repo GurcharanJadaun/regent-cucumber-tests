@@ -6,7 +6,7 @@
         "-Dspring.main.banner-mode=off",
         "-Dlogging.pattern.console=",
         "-jar",
-        "D:\\Work\\smoke-suite-automation\\playwright-mcp-server\\target\\playwright-mcp-server-1.0.0.jar"
+        "D:\\Work\\regent-cucumber-tests\\playwright-mcp-server\\target\\playwright-mcp-server-1.0.0.jar"
       ],
       "env": {}
     }

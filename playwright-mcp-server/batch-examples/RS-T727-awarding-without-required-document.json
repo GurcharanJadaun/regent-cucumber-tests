@@ -1,0 +1,337 @@
+{
+  "_meta": {
+    "testId":      "RS-T727",
+    "testName":    "Awarding without required document",
+    "environment": "remqa47",
+    "sourceClass": "org.regent.seiCapellaSOW.SEIAwardUsingDocumentTest#awardingWithoutRequiredDocument",
+
+    "_dynamic_values": {
+      "note": "Two values below are generated at runtime by the Java framework and must be resolved before running this batch.",
+
+      "studentLastName": {
+        "how": "new StudentUser() generates lastName = 'AUTO' + 8 random uppercase chars (e.g. AUTOHJKLMNOP)",
+        "usedIn": "SBL file name, ISIR file name, and student search in Process Log → Students tab"
+      },
+      "studentFirstName": {
+        "how": "new StudentUser() generates firstName = 'AUTO' + 8 random uppercase chars (e.g. AUTOMKXPQRST)",
+        "usedIn": "Clicking the student link in the Students tab"
+      },
+      "sblFilePath": {
+        "pattern": "D:\\Work\\smoke-suite-automation\\target\\files\\{studentLastName_lowercase}_sbl.xml",
+        "example": "D:\\Work\\smoke-suite-automation\\target\\files\\autohjklmnop_sbl.xml",
+        "generatedBy": "SblBuilder.buildSbl() — writes XML to Settings.config.getTargetPath() (= target/files)"
+      },
+      "isirFilePath": {
+        "pattern": "D:\\Work\\smoke-suite-automation\\target\\files\\{studentLastName_lowercase}_isir.txt",
+        "example": "D:\\Work\\smoke-suite-automation\\target\\files\\autohjklmnop_isir.txt",
+        "generatedBy": "IsirBuilder.buildIsirPell() — uses template src/test/resources/YRP/YRP_ISIR.txt"
+      }
+    },
+
+    "_static_values": {
+      "baseUrl":   "https://regentremlocal47.regenteducation.net",
+      "username":  "autoAdmin",
+      "password":  "Password",
+      "targetDir": "D:\\Work\\smoke-suite-automation\\target\\files"
+    }
+  },
+
+  "stopOnError": true,
+
+  "steps": [
+
+    {
+      "id":   "navigate-to-login",
+      "tool": "browser_navigate",
+      "args": { "url": "https://regentremlocal47.regenteducation.net" }
+    },
+    {
+      "id":   "wait-login-form",
+      "tool": "browser_wait_for",
+      "args": { "selector": "#UserName", "state": "visible", "timeout": 15000 }
+    },
+    {
+      "id":   "enter-username",
+      "tool": "browser_fill",
+      "args": { "selector": "#UserName", "value": "autoAdmin" }
+    },
+    {
+      "id":   "enter-password",
+      "tool": "browser_fill",
+      "args": { "selector": "#Password", "value": "Password" }
+    },
+    {
+      "id":   "submit-login",
+      "tool": "browser_click",
+      "args": { "selector": "#LogOnBtn" }
+    },
+    {
+      "id":   "wait-dashboard-ready",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//li[@class='k-item k-state-default']/span[contains(text(),'Processes')]",
+        "state":    "visible",
+        "timeout":  20000
+      }
+    },
+
+    {
+      "id":   "click-processes-menu",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//li[@class='k-item k-state-default']/span[contains(text(),'Processes')]" }
+    },
+    {
+      "id":   "click-import-process",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//a[string()='Import Process']" }
+    },
+    {
+      "id":   "wait-import-process-page",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//span[@aria-owns='IOProcess_IOProcessTypeId_listbox']",
+        "state":    "visible",
+        "timeout":  10000
+      }
+    },
+
+    {
+      "id":   "open-process-dropdown",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//span[@aria-owns='IOProcess_IOProcessTypeId_listbox']//span[@class='k-input']" }
+    },
+    {
+      "id":   "select-import-sbl",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//ul[@id='IOProcess_IOProcessTypeId_listbox']/li[text()='Import SBL']" }
+    },
+    {
+      "id":   "upload-sbl-file",
+      "_note": "Replace the value with the actual SBL file path: target/files/{studentLastName_lowercase}_sbl.xml",
+      "tool": "browser_fill",
+      "args": {
+        "selector": "xpath=//div[@class='k-button k-upload-button']//input[@data-rem-id='importUpload']",
+        "value":    "D:\\Work\\smoke-suite-automation\\target\\files\\{{studentLastName_lowercase}}_sbl.xml"
+      }
+    },
+    {
+      "id":   "submit-sbl-import",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//button[@rem-trigger-event='submit']" }
+    },
+    {
+      "id":   "wait-sbl-loadmask-gone",
+      "tool": "browser_wait_for",
+      "args": { "selector": "xpath=//div[@class='loadmask']", "state": "hidden", "timeout": 30000 }
+    },
+
+    {
+      "id":   "click-process-log-after-sbl",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//a[string()='Process Log']" }
+    },
+    {
+      "id":   "wait-sbl-import-complete",
+      "_note": "Polls the status cell of the row containing the SBL filename until it shows 'Complete'",
+      "tool": "browser_wait_for_text",
+      "args": {
+        "selector": "xpath=//tr[contains(string(),'{{studentLastName_lowercase}}_sbl')]/td[2]",
+        "text":     "Complete",
+        "timeout":  120000
+      }
+    },
+
+    {
+      "id":   "click-import-process-for-isir",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//a[string()='Import Process']" }
+    },
+    {
+      "id":   "wait-import-process-page-isir",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//span[@aria-owns='IOProcess_IOProcessTypeId_listbox']",
+        "state":    "visible",
+        "timeout":  10000
+      }
+    },
+    {
+      "id":   "open-process-dropdown-isir",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//span[@aria-owns='IOProcess_IOProcessTypeId_listbox']//span[@class='k-input']" }
+    },
+    {
+      "id":   "select-import-isir",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//ul[@id='IOProcess_IOProcessTypeId_listbox']/li[text()='Import ISIR']" }
+    },
+    {
+      "id":   "upload-isir-file",
+      "_note": "Replace the value with the actual ISIR file path: target/files/{studentLastName_lowercase}_isir.txt",
+      "tool": "browser_fill",
+      "args": {
+        "selector": "xpath=//div[@class='k-button k-upload-button']//input[@data-rem-id='importUpload']",
+        "value":    "D:\\Work\\smoke-suite-automation\\target\\files\\{{studentLastName_lowercase}}_isir.txt"
+      }
+    },
+    {
+      "id":   "submit-isir-import",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//button[@rem-trigger-event='submit']" }
+    },
+    {
+      "id":   "wait-isir-loadmask-gone",
+      "tool": "browser_wait_for",
+      "args": { "selector": "xpath=//div[@class='loadmask']", "state": "hidden", "timeout": 30000 }
+    },
+
+    {
+      "id":   "click-process-log-after-isir",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//a[string()='Process Log']" }
+    },
+    {
+      "id":   "wait-isir-import-complete",
+      "_note": "Polls the status cell of the row containing the ISIR filename until it shows 'Complete'",
+      "tool": "browser_wait_for_text",
+      "args": {
+        "selector": "xpath=//tr[contains(string(),'{{studentLastName_lowercase}}_isir')]/td[2]",
+        "text":     "Complete",
+        "timeout":  120000
+      }
+    },
+
+    {
+      "id":   "click-students-tab",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//ul[@class='k-tabstrip-items k-reset']//li[string()='Students']" }
+    },
+    {
+      "id":   "wait-student-row",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//tr[contains(string(),'{{studentFirstName}}')]/td/a",
+        "state":    "visible",
+        "timeout":  10000
+      }
+    },
+    {
+      "id":   "click-view-student",
+      "_note": "studentFirstName = 'AUTO' + 8 random chars as generated by new StudentUser()",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//tr[contains(string(),'{{studentFirstName}}')]/td/a" }
+    },
+    {
+      "id":   "wait-student-page-loaded",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//li[@data-rem-id='AcademicPlan']/span[@class='k-link']",
+        "state":    "visible",
+        "timeout":  15000
+      }
+    },
+
+    {
+      "id":   "click-academic-plan-tab",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//li[@data-rem-id='AcademicPlan']/span[@class='k-link']" }
+    },
+    {
+      "id":   "wait-map-button",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//button[@rem-trigger-event='modifyAcademicPlanClick']",
+        "state":    "visible",
+        "timeout":  10000
+      }
+    },
+    {
+      "id":   "click-map-button",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//button[@rem-trigger-event='modifyAcademicPlanClick']" }
+    },
+
+    {
+      "id":   "wait-packaging-dialog",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//span[@aria-owns='LogTraceLevel_listbox']",
+        "state":    "visible",
+        "timeout":  10000
+      }
+    },
+    {
+      "id":   "open-log-level-dropdown",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//span[@aria-owns='LogTraceLevel_listbox']" }
+    },
+    {
+      "id":   "select-verbose-log-level",
+      "tool": "browser_click",
+      "args": {
+        "selector": "xpath=//div[@class='k-animation-container' and @aria-hidden='false']//ul[@id='LogTraceLevel_listbox']/li[contains(string(),'Verbose')]"
+      }
+    },
+    {
+      "id":   "click-basic-packaging",
+      "tool": "browser_click",
+      "args": { "selector": "#btnBasicPackaging" }
+    },
+
+    {
+      "id":   "wait-finish-button-enabled",
+      "_note": "Finish button becomes enabled only after packaging completes — can take up to 2 minutes",
+      "tool": "browser_wait_for",
+      "args": {
+        "selector": "xpath=//button[contains(string(),'Finish')]",
+        "state":    "visible",
+        "timeout":  120000
+      }
+    },
+    {
+      "id":   "click-finish",
+      "tool": "browser_click",
+      "args": { "selector": "xpath=//button[contains(string(),'Finish')]" }
+    },
+
+    {
+      "id":   "wait-academic-plan-appear",
+      "_note": "Waits until 'No Current Academic Plan' disappears — page auto-refreshes after MAP completes. Timeout 10 min matches Java framework polling.",
+      "tool": "browser_wait_for_presence",
+      "args": {
+        "selector": "xpath=//div[@class='academicPlanPartial']/h6[contains(string(),'No Current Academic Plan')]",
+        "state":    "absent",
+        "timeout":  600000
+      }
+    },
+
+    {
+      "id":   "assert-pell-grant-exists",
+      "_note": "LoanType.PELL_GRANT.getType() = 'Pell Grant'",
+      "tool": "browser_assert_visible",
+      "args": {
+        "selector": "xpath=//div[@class='rem-academicYear-details current']//div[@class='rem-grid-col' and contains(string(),'Pell Grant')]",
+        "visible":  true
+      }
+    },
+    {
+      "id":   "assert-dl-subsidized-exists",
+      "_note": "LoanType.DL_SUBSIDIZED.getType() = 'Subsidized Loan'",
+      "tool": "browser_assert_visible",
+      "args": {
+        "selector": "xpath=//div[@class='rem-academicYear-details current']//div[@class='rem-grid-col' and contains(string(),'Subsidized Loan')]",
+        "visible":  true
+      }
+    },
+    {
+      "id":   "assert-dl-unsubsidized-exists",
+      "_note": "LoanType.DL_UNSUBSIDIZED.getType() = 'Unsubsidized Loan'",
+      "tool": "browser_assert_visible",
+      "args": {
+        "selector": "xpath=//div[@class='rem-academicYear-details current']//div[@class='rem-grid-col' and contains(string(),'Unsubsidized Loan')]",
+        "visible":  true
+      }
+    }
+
+  ]
+}
