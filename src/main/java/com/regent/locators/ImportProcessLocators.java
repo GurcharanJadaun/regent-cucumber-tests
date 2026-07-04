@@ -16,4 +16,20 @@ public interface ImportProcessLocators {
     // Import process names (as they appear in the dropdown)
     String IMPORT_SBL  = "Import SBL";
     String IMPORT_ISIR = "Import ISIR";
+    String IMPORT_STATE_GRANTS = "Import State Grants";
+
+    // State/Province dropdown (Kendo UI) — shown after choosing "Import State Grants"
+    // (used by both Wisconsin State Grant and Ohio OCOG imports in the source)
+    String STATE_PROVINCE_DROPDOWN = "span[aria-owns='StateProvinceCode_listbox']";
+    String STATE_PROVINCE_OPTION   = "#StateProvinceCode_listbox li:visible:text-is('%s')";
+
+    // "Create Student" checkbox + cascading Enterprise/Institution/Campus dropdowns shown
+    // when the imported ISIR has no matching student yet
+    String CREATE_STUDENT_CHECKBOX = "#IOProcess_CreateStudentFlag";
+    String ENTERPRISE_DROPDOWN     = "span[aria-owns='EnterpriseId_listbox']";
+    String INSTITUTION_DROPDOWN    = "span[aria-owns='InstitutionId_listbox']";
+    String CAMPUS_DROPDOWN         = "span[aria-owns='IOProcess_LocationId_listbox']";
+    // The source targeted all three of these cascading dropdowns' shared flyout with one fragile
+    // positional "(...)[last()]" XPath; filtering by :visible text on the open listbox instead.
+    String CASCADING_DROPDOWN_OPTION = "ul li:visible:text-is('%s')";
 }

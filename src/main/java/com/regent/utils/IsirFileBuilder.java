@@ -37,7 +37,7 @@ import java.nio.file.Paths;
  */
 public class IsirFileBuilder {
 
-    public enum IsirType { ISIR_PELL, ISIR }
+    public enum IsirType { ISIR_PELL, ISIR, ISIR_PELL_DEPENDENT }
 
     private static final String OUTPUT_DIR = "target/files";
 
@@ -51,14 +51,16 @@ public class IsirFileBuilder {
     }
 
     public static String build(StudentUser student, IsirType type, String federalSchoolCode) {
-        String templateName = (type == IsirType.ISIR_PELL) ? TEMPLATE_PELL : TEMPLATE_DEFAULT;
-        boolean isPell = (type == IsirType.ISIR_PELL);
-        return buildFromTemplate(student, templateName, isPell, federalSchoolCode);
+        boolean isPell = (type == IsirType.ISIR_PELL || type == IsirType.ISIR_PELL_DEPENDENT);
+        String templateName = isPell ? TEMPLATE_PELL : TEMPLATE_DEFAULT;
+        boolean isDependent = (type == IsirType.ISIR_PELL_DEPENDENT);
+        return buildFromTemplate(student, templateName, isPell, isDependent, federalSchoolCode);
     }
 
     private static String buildFromTemplate(StudentUser student,
                                              String templateName,
                                              boolean applyPellOverrides,
+                                             boolean isDependent,
                                              String federalSchoolCode) {
         try {
             Files.createDirectories(Paths.get(OUTPUT_DIR));
@@ -89,6 +91,12 @@ public class IsirFileBuilder {
 
             // Federal school code (from enterprise config in feature file)
             insert(buf, 874, 879, padRight(federalSchoolCode, 6));
+
+            // Dependency status (setdependencyStatus("D") equivalent) — "D" (Dependent) is
+            // required for a Parent PLUS loan to be eligible for the student at all.
+            if (isDependent) {
+                insert(buf, 111, 111, "D");
+            }
 
             // Pell-specific overrides (setIsirDataForPell equivalent).
             // The template's baked-in NSLDS Pell payment history (3 blocks) represents prior

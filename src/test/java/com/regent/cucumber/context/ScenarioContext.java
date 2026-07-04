@@ -6,6 +6,9 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.regent.config.ConfigReader;
 import com.regent.pages.AcademicPlanPage;
+import com.regent.pages.AddAwardPage;
+import com.regent.pages.AwardsPage;
+import com.regent.pages.DocumentsPage;
 import com.regent.pages.ImportProcessPage;
 import com.regent.pages.LeftNavPage;
 import com.regent.pages.LoginPage;
@@ -24,6 +27,9 @@ public class ScenarioContext {
     private ImportProcessPage importProcessPage;
     private ProcessLogPage processLogPage;
     private AcademicPlanPage academicPlanPage;
+    private DocumentsPage documentsPage;
+    private AwardsPage awardsPage;
+    private AddAwardPage addAwardPage;
 
     private StudentUser currentStudent;
     private java.util.Map<String, String> enterpriseConfig = new java.util.HashMap<>();
@@ -52,6 +58,9 @@ public class ScenarioContext {
         importProcessPage = new ImportProcessPage(page);
         processLogPage    = new ProcessLogPage(page);
         academicPlanPage  = new AcademicPlanPage(page);
+        documentsPage     = new DocumentsPage(page);
+        awardsPage        = new AwardsPage(page);
+        addAwardPage      = new AddAwardPage(page);
     }
 
     public void closeBrowser() {
@@ -67,6 +76,9 @@ public class ScenarioContext {
     public ImportProcessPage getImportProcessPage() { return importProcessPage; }
     public ProcessLogPage getProcessLogPage()       { return processLogPage; }
     public AcademicPlanPage getAcademicPlanPage()   { return academicPlanPage; }
+    public DocumentsPage getDocumentsPage()         { return documentsPage; }
+    public AwardsPage getAwardsPage()               { return awardsPage; }
+    public AddAwardPage getAddAwardPage()           { return addAwardPage; }
 
     public StudentUser getCurrentStudent()              { return currentStudent; }
     public void setCurrentStudent(StudentUser student)  { this.currentStudent = student; }

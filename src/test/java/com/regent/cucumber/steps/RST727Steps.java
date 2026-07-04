@@ -2,7 +2,11 @@ package com.regent.cucumber.steps;
 
 import com.regent.config.ConfigReader;
 import com.regent.cucumber.context.ScenarioContext;
+import com.regent.locators.AddAwardLocators;
 import com.regent.pages.AcademicPlanPage;
+import com.regent.pages.AddAwardPage;
+import com.regent.pages.AwardsPage;
+import com.regent.pages.DocumentsPage;
 import com.regent.pages.ImportProcessPage;
 import com.regent.pages.LeftNavPage;
 import com.regent.pages.LoginPage;
@@ -27,6 +31,9 @@ public class RST727Steps {
     private final ImportProcessPage importProcessPage;
     private final ProcessLogPage processLogPage;
     private final AcademicPlanPage academicPlanPage;
+    private final DocumentsPage documentsPage;
+    private final AwardsPage awardsPage;
+    private final AddAwardPage addAwardPage;
 
     public RST727Steps(ScenarioContext ctx) {
         this.ctx               = ctx;
@@ -35,6 +42,9 @@ public class RST727Steps {
         this.importProcessPage = ctx.getImportProcessPage();
         this.processLogPage    = ctx.getProcessLogPage();
         this.academicPlanPage  = ctx.getAcademicPlanPage();
+        this.documentsPage     = ctx.getDocumentsPage();
+        this.awardsPage        = ctx.getAwardsPage();
+        this.addAwardPage      = ctx.getAddAwardPage();
     }
 
     @Given("I am logged in as admin")
@@ -107,6 +117,59 @@ public class RST727Steps {
         academicPlanPage.waitForAcademicPlanAppear();
     }
 
+    @And("I refresh the Academic Plan")
+    public void iRefreshTheAcademicPlan() {
+        academicPlanPage.refreshAcademicPlan();
+    }
+
+    /** First visit to Documents in a scenario: from Process Log, via Students tab + view-user link. */
+    @When("I navigate to the student's Documents")
+    public void iNavigateToStudentDocuments() {
+        processLogPage.navigateToStudent(ctx.getCurrentStudent());
+        leftNavPage.clickDocumentsTab();
+    }
+
+    /** Subsequent visit to Documents within the same scenario (already inside the student profile). */
+    @When("I return to the student's Documents")
+    public void iReturnToStudentDocuments() {
+        leftNavPage.clickDocumentsTab();
+    }
+
+    @When("I return to the student's Academic Plan")
+    public void iReturnToStudentAcademicPlan() {
+        leftNavPage.clickAcademicPlanTab();
+    }
+
+    @When("I add a required document {string}")
+    public void iAddARequiredDocument(String documentName) {
+        documentsPage.addDocument(documentName);
+    }
+
+    @When("I mark the document {string} as {string}")
+    public void iMarkTheDocumentAs(String documentName, String status) {
+        documentsPage.setStatusForDocument(documentName, status);
+    }
+
+    @When("I navigate to the student's Awards")
+    public void iNavigateToStudentAwards() {
+        leftNavPage.clickAwardsTab();
+    }
+
+    @When("I add a manual award for the Parent PLUS fund")
+    public void iAddAManualAwardForTheParentPlusFund() {
+        awardsPage.clickAddAward();
+        addAwardPage.chooseOptionsOnStep1(AddAwardLocators.PARENT_PLUS_FUND);
+        addAwardPage.chooseOptionsOnStep2();
+        addAwardPage.clickContinueButtonOnStep3();
+        addAwardPage.clickContinueButtonOnStep4();
+        addAwardPage.finishAddAwardProcess();
+    }
+
+    @And("I reveal hidden awards")
+    public void iRevealHiddenAwards() {
+        academicPlanPage.clickFirstHiddenAwardLink();
+    }
+
     @Then("the following awards should be present:")
     public void theFollowingAwardsShouldBePresent(DataTable dataTable) {
         List<String> awards = dataTable.asList();
@@ -120,7 +183,7 @@ public class RST727Steps {
     public void theFollowingAwardsShouldNotBePresent(DataTable dataTable) {
         List<String> awards = dataTable.asList();
         for (String award : awards) {
-            Assert.assertFalse(academicPlanPage.isAwardPresent(award.trim()),
+            Assert.assertTrue(academicPlanPage.isAwardAbsentEventually(award.trim(), 90),
                     "Award was unexpectedly found on Academic Plan: " + award);
         }
     }

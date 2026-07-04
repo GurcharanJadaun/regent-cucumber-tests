@@ -15,18 +15,19 @@ public abstract class BasePage {
         this.timeout = ConfigReader.getTimeout();
     }
 
+    /**
+     * Playwright's click()/fill() already auto-wait for the full actionability set (visible,
+     * stable, enabled, receives events) before acting — that's Playwright's core model, unlike
+     * Selenium where every wait must be explicit. An extra waitFor(VISIBLE) beforehand doesn't
+     * change what gets waited for, it just repeats the same polling cycle twice per action, which
+     * is why every click/fill in this app was taking roughly double what it needed to.
+     */
     protected void click(String selector) {
-        page.locator(selector).waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE)
-                .setTimeout(timeout));
-        page.locator(selector).click();
+        page.locator(selector).click(new Locator.ClickOptions().setTimeout(timeout));
     }
 
     protected void fill(String selector, String value) {
-        page.locator(selector).waitFor(new Locator.WaitForOptions()
-                .setState(WaitForSelectorState.VISIBLE)
-                .setTimeout(timeout));
-        page.locator(selector).fill(value);
+        page.locator(selector).fill(value, new Locator.FillOptions().setTimeout(timeout));
     }
 
     protected String getText(String selector) {

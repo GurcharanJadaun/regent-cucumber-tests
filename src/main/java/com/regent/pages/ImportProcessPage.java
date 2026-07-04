@@ -30,6 +30,41 @@ public class ImportProcessPage extends BasePage {
         uploadFileAndSubmit(filePath);
     }
 
+    /** Generic process-type selection, exposed for import flows beyond SBL/ISIR (e.g. State Grants). */
+    public void chooseImportProcess(String importType) {
+        selectImportType(importType);
+    }
+
+    /**
+     * "Import State Grants" reveals a second Kendo dropdown for the state/province; both the
+     * Wisconsin State Grant and Ohio OCOG import flows in the source select it the same way
+     * before uploading their respective files.
+     */
+    public void selectStateProvince(String stateProvince) {
+        click(ImportProcessLocators.STATE_PROVINCE_DROPDOWN);
+        click(String.format(ImportProcessLocators.STATE_PROVINCE_OPTION, stateProvince));
+        waitForAjaxRequestToBeFinished();
+    }
+
+    /**
+     * Shown when an imported ISIR has no matching student yet: ticks "Create Student" and
+     * cascades through Enterprise -> Institution -> Campus, each dropdown populating the next.
+     */
+    public void createStudentFromIsir(String enterprise, String institution, String campus) {
+        click(ImportProcessLocators.CREATE_STUDENT_CHECKBOX);
+        click(ImportProcessLocators.ENTERPRISE_DROPDOWN);
+        click(String.format(ImportProcessLocators.CASCADING_DROPDOWN_OPTION, enterprise));
+        click(ImportProcessLocators.INSTITUTION_DROPDOWN);
+        click(String.format(ImportProcessLocators.CASCADING_DROPDOWN_OPTION, institution));
+        click(ImportProcessLocators.CAMPUS_DROPDOWN);
+        click(String.format(ImportProcessLocators.CASCADING_DROPDOWN_OPTION, campus));
+    }
+
+    /** Uploads an already-built file and submits — exposed for import flows built outside this class. */
+    public void uploadFile(String filePath) {
+        uploadFileAndSubmit(filePath);
+    }
+
     private void selectImportType(String importType) {
         click(ImportProcessLocators.PROCESS_TYPE_DROPDOWN);
         String optionSelector = String.format(ImportProcessLocators.PROCESS_TYPE_OPTION, importType);

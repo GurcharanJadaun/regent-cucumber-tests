@@ -32,4 +32,37 @@ public interface ProcessLogLocators {
     String PROCESS_ID_DESC_SORT   = "//th[@data-title='Process Id' and @data-dir='desc']";
     String PROCESS_ID_SORT_LINK   = "//th[@data-title='Process Id']/a[@class='k-link']";
     String STARTED_ON_SORT_LINK   = "//th[@data-title='Started On' and @data-dir='desc']/a[@class='k-link']";
+
+    // First-row status lookups for specific process types (exports/packaging/rollup), matching
+    // the "grab the newest row of this type" pattern used for import status lookups above.
+    String EXPORT_COD_STATUS            = "(//tr[contains(string(),'Export COD')])[1]/td[2]";
+    String EXPORT_NSLDS_STATUS          = "(//tr[contains(string(),'Export NSLDS')])[1]/td[2]";
+    String EXPORT_ISIR_CORRECTION_STATUS = "(//tr[contains(string(),'Export ISIR Correction')])[1]/td[2]";
+    String EXPORT_EST_EXPECTED_STATUS   = "(//tr[contains(string(),'Export Student Transactions') and contains(string(),'EST_Expected')])[1]/td[2]";
+    String EXPORT_EST_DRI_STATUS        = "(//tr[contains(string(),'Export Student Transactions') and contains(string(),'EST_DRI')])[1]/td[2]";
+    String EXPORT_EST_ACTUAL_STATUS     = "(//tr[contains(string(),'Export Student Transactions') and contains(string(),'EST_Actual')])[1]/td[2]";
+    String EXPORT_EST_STATUS            = "(//tr[contains(string(),'Export Student Transactions')])[1]/td[2]";
+    String RNA_ANALYSIS_STATUS          = "(//tr[contains(string(),'RNA Analysis')])[1]/td[2]";
+    String CE_ROLLUP_STATUS             = "(//tr[contains(string(),'Process CE Rollup')])[1]/td[2]";
+    // Generic "first row matching this process-type substring" status lookup (e.g. Communications)
+    String PROCESS_ITEM_STATUS_BY_TYPE  = "(//tr[contains(string(),'%s')])[1]/td[2]";
+    String PROCESS_ITEM_FILENAME_BY_TYPE = "//div[@data-rem-widgetname='ProcessGrid']//tr[contains(string(),'%s')][1]/td[8]";
+
+    // Details tab: label/value pairs (Total records, Processed Records, Unprocessed records)
+    String DETAILS_FIELD_VALUE_BY_LABEL = "//div[@data-rem-id='detailsView']//div[@class='details-label-short' and normalize-space()='%s']/following-sibling::div";
+
+    // Students tab: filter by External Id, grid rows/cells, view links, invalid-record markers
+    String EXTERNAL_ID_FILTER          = "//div[@data-rem-widgetname='ProcessViewStudents']//th[@data-field='ExternalId1']/a[@title='Filter']";
+    String GRID_FILTER_VALUE_INPUT     = "(//form[@title='Show items with value that:'])[last()]//input[@title='Value']";
+    String GRID_FILTER_SUBMIT_BUTTON   = "(//form[@title='Show items with value that:'])[last()]//button[text()='Filter']";
+    String STUDENT_ROW_BY_TEXT         = "//tr[contains(string(),'%s')]";
+    String INVALID_STUDENT_RECORD      = "//tr[contains(string(),'%s')]//td[contains(text(),'This record is not valid for processing')]";
+    String SBL_STUDENT_GRID_CELLS      = "//div[@data-rem-id='SBLgrid']//tr[contains(string(),'%s')]//td[@role='gridcell']";
+    String STUDENT_COMMUNICATION_STATUS = "//div[@data-rem-widgetname='ProcessViewStudents']//div[contains(@class,'grid-content')]//tr[contains(string(),'%s')]/td[7]";
+
+    // Selection Parameters tab
+    String EST_PROCESS_TYPE = "//div[@class='six columns']/div[@class='row' and contains(string(),'EST Type:')]/div[@class='details-field']";
+
+    // Grid presence check
+    String PROCESS_GRID = "#Process_Grid";
 }
