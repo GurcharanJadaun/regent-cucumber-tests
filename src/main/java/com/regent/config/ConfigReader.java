@@ -28,7 +28,11 @@ public class ConfigReader {
     public static String getBaseUrl()       { return props.getProperty("base.url"); }
     public static String getAdminUsername() { return props.getProperty("admin.username"); }
     public static String getAdminPassword() { return props.getProperty("admin.password"); }
-    public static String getDateToSet()     { return props.getProperty("date.to.set", ""); }
+    // FAY-alignment reference date for SblXmlBuilder.currentTestDate() (lastAttendedDate on the
+    // in-progress course). The year-6 suite pins this before the 6/30 FAY 2025-26 cutoff; testing
+    // FAY 2026-27 needs the opposite — a date after 6/30 — without touching config.properties and
+    // affecting the main suite, hence the system-property override.
+    public static String getDateToSet()     { return System.getProperty("date.to.set", props.getProperty("date.to.set", "")); }
     public static String getSshUsername()   { return props.getProperty("ssh.username", ""); }
     public static String getSshPassword()   { return props.getProperty("ssh.password", ""); }
 

@@ -37,7 +37,7 @@ import java.nio.file.Paths;
  */
 public class IsirFileBuilder {
 
-    public enum IsirType { ISIR_PELL, ISIR, ISIR_PELL_DEPENDENT }
+    public enum IsirType { ISIR_PELL, ISIR, ISIR_PELL_DEPENDENT, ISIR_PELL_YEAR7, ISIR_PELL_DEPENDENT_YEAR7 }
 
     private static final String OUTPUT_DIR = "target/files";
 
@@ -45,23 +45,39 @@ public class IsirFileBuilder {
     private static final String TEMPLATE_PELL    = "YRP_ISIR_5.txt";
     private static final String TEMPLATE_DEFAULT = "isir_template_5.txt";
 
+    // The import parser rejected a year-7 (FAY 2026-27) record built from the year-6 template
+    // with: "Line length must be exactly 7944 characters long" (our _5 templates are 7704). The
+    // parser only validates length + the position-1 year digit to pick a record layout, so
+    // padding with trailing blanks to the required length is worth trying before assuming we
+    // need the real 2026-27 field-position spec — any new fields in that gap just come through
+    // blank, which may or may not satisfy validation further into the record.
+    private static final int RECORD_LENGTH_YEAR7 = 7944;
+
     public static String build(StudentUser student, String isirType, String federalSchoolCode) {
         IsirType type = IsirType.valueOf(isirType.toUpperCase());
         return build(student, type, federalSchoolCode);
     }
 
     public static String build(StudentUser student, IsirType type, String federalSchoolCode) {
-        boolean isPell = (type == IsirType.ISIR_PELL || type == IsirType.ISIR_PELL_DEPENDENT);
+        boolean isPell = (type == IsirType.ISIR_PELL || type == IsirType.ISIR_PELL_DEPENDENT
+                || type == IsirType.ISIR_PELL_YEAR7 || type == IsirType.ISIR_PELL_DEPENDENT_YEAR7);
         String templateName = isPell ? TEMPLATE_PELL : TEMPLATE_DEFAULT;
-        boolean isDependent = (type == IsirType.ISIR_PELL_DEPENDENT);
-        return buildFromTemplate(student, templateName, isPell, isDependent, federalSchoolCode);
+        boolean isDependent = (type == IsirType.ISIR_PELL_DEPENDENT || type == IsirType.ISIR_PELL_DEPENDENT_YEAR7);
+        // Year indicator is the only thing that changes between the 2025-26 (year-6) and 2026-27
+        // (year-7) variants — same template, same dependency/Pell field overrides either way. See
+        // docs/FAY2026-27-ISIR-Investigation.md for what it actually takes on REMQA47 for a
+        // year-7 ISIR to package awards (it needs institution-level config, not just this file).
+        String yearIndicator = (type == IsirType.ISIR_PELL_YEAR7 || type == IsirType.ISIR_PELL_DEPENDENT_YEAR7)
+                ? "7" : "6";
+        return buildFromTemplate(student, templateName, isPell, isDependent, federalSchoolCode, yearIndicator);
     }
 
     private static String buildFromTemplate(StudentUser student,
                                              String templateName,
                                              boolean applyPellOverrides,
                                              boolean isDependent,
-                                             String federalSchoolCode) {
+                                             String federalSchoolCode,
+                                             String yearIndicator) {
         try {
             Files.createDirectories(Paths.get(OUTPUT_DIR));
 
@@ -79,8 +95,8 @@ public class IsirFileBuilder {
 
             StringBuilder buf = new StringBuilder(template);
 
-            // Year indicator → "6" for AY 2025-26
-            insert(buf, 0, 0, "6");
+            // Year indicator — "6" for AY 2025-26 (this suite's usual value) or "7" for AY 2026-27
+            insert(buf, 0, 0, yearIndicator);
 
             // Student identity fields (2025 positions)
             insert(buf, 242, 276, padRight(student.getFirstName(),  35));
@@ -140,6 +156,10 @@ public class IsirFileBuilder {
                 insert(buf, 4843, 4848, "");    // nsdlPellAmountPaidToDate3
                 insert(buf, 4849, 4855, "");    // nsdlPellPercentScheduledAwardUsedByAwardYear3
                 insert(buf, 4856, 4861, "");    // nsdlPellAwardAmount3
+            }
+
+            if ("7".equals(yearIndicator) && buf.length() < RECORD_LENGTH_YEAR7) {
+                buf.append(" ".repeat(RECORD_LENGTH_YEAR7 - buf.length()));
             }
 
             String filePath = OUTPUT_DIR + "/" + student.getIsirFileName();

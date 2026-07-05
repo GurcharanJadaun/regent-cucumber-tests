@@ -117,7 +117,13 @@ public class SblXmlBuilder {
 
             int beforeUnits   = 12 / Math.max(beforeCount, 1);
             int previousUnits = 12 / Math.max(previousCount, 1);
-            int actualUnits   = 12 / Math.max(actualCount, 1);
+            // Optional override (enterpriseConfig "termActualUnits") for terms much shorter than
+            // the original design assumed — e.g. a real Fall 2026 quarter term is ~67 days vs.
+            // Spring 2026's 262, and cramming the default 12 units into that span may be what a
+            // short-term SBL validation rejects. Falls back to the original calculation.
+            int actualUnits = enterpriseConfig.containsKey("termActualUnits")
+                    ? Integer.parseInt(enterpriseConfig.get("termActualUnits"))
+                    : 12 / Math.max(actualCount, 1);
 
             String programId = enterpriseConfig.getOrDefault("programId", "");
             for (int i = 0; i < beforeCount; i++) {

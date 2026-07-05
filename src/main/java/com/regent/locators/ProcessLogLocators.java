@@ -7,11 +7,15 @@ public interface ProcessLogLocators {
     // Refresh button inside the visible process log panel
     String REFRESH_BUTTON = "//div[contains(@style,'display: block; ')]//button[@class='k-button r-entity-menu']";
 
-    // Tabs at bottom of process log (Students, Details, etc.)
-    String PROCESS_TAB = "//ul[@class='k-tabstrip-items k-reset']//li[string()='%s']";
+    // Tabs at bottom of process log (Students, Details, etc.). This grid is opened/closed
+    // repeatedly across a scenario (or across scenarios in one run), so — same as every other
+    // repeatedly-instantiated Kendo widget in this app — a stale hidden copy of the tab strip
+    // or the Error Log panel can outrank the current one; filter by :visible rather than
+    // picking the first/only DOM match.
+    String PROCESS_TAB = "ul.k-tabstrip-items.k-reset li span.k-link:visible:text-is('%s')";
 
     // Error details shown on the "Error Log" tab after clicking a failed process's row
-    String ERROR_LOG_DETAILS = "//div[@data-rem-widgetname='ProcessViewErrorLog']//div[@class='details-field']";
+    String ERROR_LOG_DETAILS = "div[data-rem-widgetname='ProcessViewErrorLog']:visible .details-field";
 
     // View student link in the Students tab grid
     String VIEW_STUDENT_LINK = "//tr[contains(string(),'%s')]/td/a";
